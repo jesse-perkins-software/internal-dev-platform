@@ -1009,19 +1009,80 @@ function getAmounts($userID) {
     return mysqli_fetch_assoc($result);
 }
 
-function getActualAmounts($userID) {
+function getYearlyActualAmounts($userID, $year) {
     global $conn;
 
     $sql = "SELECT
-                (SELECT SUM(amount) FROM transactions JOIN budgetCategorySelections ON transactions.categoryID = budgetCategorySelections.categoryID WHERE transactions.userID = '$userID' AND budgetCategorySelections.sectionID = 1) AS needs_actual_total,
-                (SELECT SUM(amount) FROM transactions JOIN budgetCategorySelections ON transactions.categoryID = budgetCategorySelections.categoryID WHERE transactions.userID = '$userID' AND budgetCategorySelections.sectionID = 2) AS wants_actual_total,
-                (SELECT SUM(amount) FROM transactions JOIN budgetCategorySelections ON transactions.categoryID = budgetCategorySelections.categoryID WHERE transactions.userID = '$userID' AND budgetCategorySelections.sectionID = 3) AS savings_actual_total
+                MONTH(date) AS month,
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 1 THEN amount ELSE 0 END) AS needs_total,
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 2 THEN amount ELSE 0 END) AS wants_total,
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 3 THEN amount ELSE 0 END) AS savings_total
             FROM
-                budgetAllocation
+                transactions
             INNER JOIN
-                budgetCategorySelections ON budgetAllocation.categoryID = budgetCategorySelections.categoryID
+                budgetCategorySelections ON transactions.categoryID = budgetCategorySelections.categoryID
             WHERE
-                budgetAllocation.userID = '$userID'
+                transactions.userID = '$userID'
+                AND YEAR(date) = '$year'
+            GROUP BY
+                MONTH(date)
+            ORDER BY
+                MONTH(date) ASC
+            ";
+    $result = mysqli_query($conn, $sql);
+    $rows = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $rows[] = $row;
+    }
+    return $rows;
+}
+
+function getBudgetSpent($userID) {
+    global $conn;
+
+    $currentMonth = date('m');
+    $currentYear = date('Y');
+
+    $sql = "SELECT
+                (
+                    SELECT SUM(amount)
+                    FROM budgetAllocation
+                    WHERE userID = '$userID'
+                      AND area != 'Income'
+                ) AS budget_total,
+                (
+                    SELECT SUM(t.amount)
+                    FROM transactions t
+                    INNER JOIN categories c ON t.categoryID = c.categoryID
+                    INNER JOIN categoryGroups cg ON c.groupID = cg.groupID
+                    WHERE t.userID = '$userID'
+                      AND MONTH(t.date) = '$currentMonth'
+                      AND YEAR(t.date) = '$currentYear'
+                      AND cg.groupName != 'Income'
+                ) AS actual_total
+            ";
+    $result = mysqli_query($conn, $sql);
+    return mysqli_fetch_assoc($result);
+}
+
+function getActualAmounts($userID) {
+    global $conn;
+
+    $currentMonth = date('m');
+    $currentYear = date('Y');
+
+    $sql = "SELECT
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 1 THEN transactions.amount ELSE 0 END) AS needs_actual_total,
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 2 THEN transactions.amount ELSE 0 END) AS wants_actual_total,
+                SUM(CASE WHEN budgetCategorySelections.sectionID = 3 THEN transactions.amount ELSE 0 END) AS savings_actual_total
+            FROM
+                transactions
+            INNER JOIN
+                budgetCategorySelections ON transactions.categoryID = budgetCategorySelections.categoryID
+            WHERE
+                transactions.userID = '$userID'
+                AND MONTH(transactions.date) = '$currentMonth'
+                AND YEAR(transactions.date) = '$currentYear'
             ";
     $result = mysqli_query($conn, $sql);
     return mysqli_fetch_assoc($result);

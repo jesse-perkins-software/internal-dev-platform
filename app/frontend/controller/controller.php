@@ -162,13 +162,23 @@ if ($page == "SignInPage") {
                 echo $result;
                 exit();
             }
+            case "LoadCard6": {
+                $result = json_encode(getBudgetSpent($_SESSION["userID"]));
+                echo $result;
+                exit();
+            }
             case "LoadCard7": {
                 $result = getLargestPurchase($_SESSION["userID"]);
                 echo $result;
                 exit();
             }
             case "GetActualAmounts": {
-                $result = json_encode(getActualAmounts($_SESSION["userID"]));
+                $actual = getActualAmounts($_SESSION["userID"]);
+                $yearly = getYearlyActualAmounts($_SESSION["userID"], date("Y"));
+                $result = json_encode([
+                    "actual" => $actual,
+                    "yearly" => $yearly
+                ]);
                 echo $result;
                 exit();
             }
