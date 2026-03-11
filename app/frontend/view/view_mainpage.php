@@ -221,7 +221,7 @@
                         </div>
                         <div></div>
                     </div>
-                    <h5 id="top-transaction-category-value"></h5>
+                    <h5 id="top-transaction-category-value">None</h5>
                     <div class="card-bottom-half">
                         <div></div>
                         <div class="card-bottom-text">
@@ -307,7 +307,7 @@
         data: {
             datasets: [
                 {
-                    data: [50, 30, 20],
+                    data: [0, 0, 0],
                     backgroundColor: ["rgb(6, 95, 70)", 'rgb(30, 58, 138)', 'rgb(178,34,34)']
                 }
             ],
@@ -330,7 +330,7 @@
                 {
                     type: "bar",
                     label: "Savings",
-                    data: [50, 25, 42.5, 105, 75, 87.5, 80, 37.5, 55, 60, 45, 65],
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: "rgb(6, 95, 70)",
                     borderColor: "rgb(6, 95, 70, 0.5)",
                     tension: 0,
@@ -339,7 +339,7 @@
                 {
                     type: "bar",
                     label: "Needs",
-                    data: [35, 15, 32.5, 75, 50, 57.5, 60, 22.5, 35, 30, 25, 45],
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: "rgb(30, 58, 138)",
                     borderColor: "rgb(30, 58, 138, 0.5)",
                     tension: 0,
@@ -348,7 +348,7 @@
                 {
                     type: "bar",
                     label: "Wants",
-                    data: [20, 10, 10, 30, 25, 30, 20, 15, 20, 15, 20, 20],
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: "rgb(178, 34, 34)",
                     borderColor: "rgb(178, 34, 34, 0.5)",
                     tension: 0,
